@@ -81,7 +81,7 @@ abstract contract MarketQuery is MarketplaceStorage {
 
     function getListings(uint256 offset, uint256 limit) external view returns (ListingView[] memory) {
         uint256 total = sListingTokens.length;
-        
+
         // solhint-disable-next-line gas-strict-inequalities
         if (offset >= total) {
             return new ListingView[](0);

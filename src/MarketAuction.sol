@@ -41,7 +41,7 @@ abstract contract MarketAuction is MarketAdmin, MarketInternal, ReentrancyGuard 
     function bid(address nftAddress, uint256 tokenId) external payable nonReentrant whenNotPaused {
         _checkAuctionExists(nftAddress, tokenId);
         Auction storage auction = sAuctions[nftAddress][tokenId];
-        
+
         // solhint-disable-next-line gas-strict-inequalities
         if (block.timestamp >= auction.endTime) {
             revert MarketErrors.AuctionAlreadyEnded();
