@@ -181,10 +181,10 @@ curl -L https://foundry.paradigm.xyz | bash && foundryup
 
 ```bash
 # Clone the repository
-git clone https://github.com/alinasirlou2020/Decentralized-NFT-Marketplace.git
+git clone https://github.com/alinasirlou2020/Vault-NFT-Marketplace.git
 
 # Enter the project directory
-cd Decentralized-NFT-Marketplace
+cd Vault-NFT-Marketplace
 
 # Install dependencies (OpenZeppelin, etc.)
 forge install
