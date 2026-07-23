@@ -201,7 +201,7 @@ The frontend is designed as a lightweight, reactive trading desk that interacts 
 
 ### Access the Live DApp
 You can access the hosted version of the marketplace at the following URL:
-- **Production URL:** [https://vault-marketplace.vercel.app](https://vault-marketplace.vercel.app) *(Coming Soon)*
+- **Production URL:** [https://vault-nft-marketplace.vercel.app/](https://vault-nft-marketplace.vercel.app/) 
 
 ### Local Development & Customization
 If you wish to run the application locally or contribute to the UI:
