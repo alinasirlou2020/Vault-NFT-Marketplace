@@ -19,7 +19,7 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: "dist", // تغییر کرد تا مستقیماً در dist ساخته شود
     emptyOutDir: true,
   },
   server: {
