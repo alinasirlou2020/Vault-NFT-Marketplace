@@ -1,0 +1,275 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-neon-purple: #8b5cf6;
+  --color-neon-cyan: #06b6d4;
+  --color-neon-pink: #ec4899;
+  --color-neon-blue: #3b82f6;
+  --color-neon-green: #10b981;
+  --font-sans: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 240 10% 4%;
+  --foreground: 240 5% 95%;
+  --card: 240 8% 7%;
+  --card-foreground: 240 5% 95%;
+  --popover: 240 8% 7%;
+  --popover-foreground: 240 5% 95%;
+  --primary: 265 80% 65%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 6% 12%;
+  --secondary-foreground: 240 5% 85%;
+  --muted: 240 6% 12%;
+  --muted-foreground: 240 4% 55%;
+  --accent: 199 90% 45%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 6% 14%;
+  --input: 240 6% 14%;
+  --ring: 265 80% 65%;
+  --radius: 0.75rem;
+  --app-font-sans: 'Inter', system-ui, sans-serif;
+  --app-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(240, 10%, 4%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(265, 80%, 45%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(265, 80%, 60%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(6, 182, 212, 0.06), transparent);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  /* Neon glow effects */
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 60px rgba(139, 92, 246, 0.1);
+  }
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 60px rgba(6, 182, 212, 0.1);
+  }
+  .glow-pink {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4), 0 0 60px rgba(236, 72, 153, 0.1);
+  }
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 60px rgba(59, 130, 246, 0.1);
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+  }
+  .text-glow-cyan {
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
+  }
+
+  /* Glass morphism */
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Gradient borders */
+  .border-gradient-purple {
+    border: 1px solid transparent;
+    background: linear-gradient(hsl(240, 8%, 7%), hsl(240, 8%, 7%)) padding-box,
+      linear-gradient(135deg, rgba(139, 92, 246, 0.6), rgba(6, 182, 212, 0.3)) border-box;
+  }
+  .border-gradient-cyan {
+    border: 1px solid transparent;
+    background: linear-gradient(hsl(240, 8%, 7%), hsl(240, 8%, 7%)) padding-box,
+      linear-gradient(135deg, rgba(6, 182, 212, 0.6), rgba(139, 92, 246, 0.3)) border-box;
+  }
+  .border-gradient-pink {
+    border: 1px solid transparent;
+    background: linear-gradient(hsl(240, 8%, 7%), hsl(240, 8%, 7%)) padding-box,
+      linear-gradient(135deg, rgba(236, 72, 153, 0.6), rgba(139, 92, 246, 0.3)) border-box;
+  }
+
+  /* Neon gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-text-pink {
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-text-gold {
+    background: linear-gradient(135deg, #f59e0b, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  }
+  .bg-gradient-pink {
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  }
+  .bg-gradient-dark {
+    background: linear-gradient(135deg, hsl(240, 10%, 6%), hsl(250, 10%, 8%));
+  }
+
+  /* NFT card hover effect */
+  .nft-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .nft-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
+  }
+
+  /* Animated gradient border on hover */
+  .hover-glow {
+    transition: box-shadow 0.25s ease;
+  }
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.3), inset 0 0 30px rgba(139, 92, 246, 0.03);
+  }
+
+  /* Pulse animation for auction countdown */
+  .pulse-urgent {
+    animation: pulseUrgent 1s ease-in-out infinite;
+  }
+  @keyframes pulseUrgent {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* Shimmer loading skeleton */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Grid pattern overlay */
+  .grid-pattern {
+    background-image:
+      linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Badge variants */
+  .badge-auction {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(236, 72, 153, 0.2));
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #f59e0b;
+  }
+  .badge-rental {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
+    border: 1px solid rgba(6, 182, 212, 0.4);
+    color: #06b6d4;
+  }
+  .badge-listed {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #8b5cf6;
+  }
+  .badge-sold {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #10b981;
+  }
+
+  /* Chain logo pill */
+  .polygon-badge {
+    background: linear-gradient(135deg, rgba(130, 71, 229, 0.3), rgba(91, 50, 162, 0.3));
+    border: 1px solid rgba(130, 71, 229, 0.5);
+    color: #a855f7;
+  }
+}
+
+/* RainbowKit theme overrides */
+[data-rk] {
+  --rk-colors-accentColor: #8b5cf6 !important;
+  --rk-colors-accentColorForeground: #ffffff !important;
+  --rk-colors-modalBackground: hsl(240, 8%, 7%) !important;
+  --rk-colors-modalBorder: rgba(139, 92, 246, 0.2) !important;
+  --rk-colors-generalBorder: rgba(255, 255, 255, 0.08) !important;
+  --rk-colors-menuItemBackground: rgba(139, 92, 246, 0.1) !important;
+  --rk-colors-profileForeground: hsl(240, 8%, 7%) !important;
+  --rk-radii-modal: 16px !important;
+  --rk-radii-connectButton: 10px !important;
+}
