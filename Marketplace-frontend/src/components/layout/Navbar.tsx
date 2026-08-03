@@ -30,7 +30,6 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // بستن منوی کشویی با کلیک بیرون از آن
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -64,7 +63,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-2 group">
             <Hexagon className="w-8 h-8 text-neon-purple group-hover:text-neon-cyan transition-colors" />
             <span className="text-xl font-bold tracking-tight gradient-text">
-              Vault Market
+              NexusMarket
             </span>
           </Link>
 
@@ -86,13 +85,12 @@ export function Navbar() {
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
           <div className="polygon-badge px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm">
             <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
             Amoy Testnet
           </div>
 
-          {/* بخش اصلی اتصال ولت به همراه دراپ‌داون سفارشی */}
           <ConnectButton.Custom>
             {({
               account,
@@ -106,7 +104,7 @@ export function Navbar() {
 
               return (
                 <div
-                  className="relative"
+                  className="flex items-center gap-3"
                   ref={dropdownRef}
                   {...(!ready && {
                     "aria-hidden": true,
@@ -141,133 +139,139 @@ export function Navbar() {
                     }
 
                     return (
-                      <div className="relative">
-                        {/* دکمه ولت اصلی دست‌نخورده + فلش دراپ‌داون کنار آن */}
-                        <div className="flex items-center gap-1.5 bg-white/10 hover:bg-white/15 border border-white/10 px-2.5 py-1.5 rounded-full transition-all">
-                          <button
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="flex items-center gap-2 text-white text-sm font-medium focus:outline-none"
-                          >
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-[10px]">
-                              💎
-                            </div>
-                            <span>{account.displayName}</span>
-                          </button>
-
-                          <div className="h-4 w-px bg-white/20 mx-1" />
-
-                          <button
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                            className="text-white/70 hover:text-white p-1 transition-transform duration-200 focus:outline-none"
-                          >
-                            <ChevronDown
-                              className={cn(
-                                "w-4 h-4 transition-transform duration-200",
-                                dropdownOpen && "rotate-180",
-                              )}
-                            />
-                          </button>
-                        </div>
-
-                        {/* (Dropdown) */}
-                        <AnimatePresence>
-                          {dropdownOpen && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                              transition={{ duration: 0.15 }}
-                              className="absolute right-0 mt-2 w-56 bg-[#121118]/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-2 shadow-[0_10px_30px_rgba(0,0,0,0.5)] z-50 flex flex-col gap-1"
+                      <div className="flex items-center gap-3">
+                        {/* منوی دراپ‌داون ولت */}
+                        <div className="relative">
+                          <div className="flex items-center gap-1.5 bg-white/10 hover:bg-white/15 border border-white/10 px-2.5 py-1.5 rounded-full transition-all">
+                            <button
+                              onClick={() => setDropdownOpen(!dropdownOpen)}
+                              className="flex items-center gap-2 text-white text-sm font-medium focus:outline-none"
                             >
-                              {/* Profile */}
-                              <Link
-                                href={
-                                  address ? `/profile/${address}` : "/profile"
-                                }
-                                onClick={() => setDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                              >
-                                <User className="w-4 h-4 text-purple-400" />
-                                <span>Profile</span>
-                              </Link>
-
-                              {/* Dashboard */}
-                              <Link
-                                href="/dashboard"
-                                onClick={() => setDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                              >
-                                <LayoutDashboard className="w-4 h-4 text-purple-400" />
-                                <span>Dashboard</span>
-                              </Link>
-
-                              {/* line*/}
-                              <div className="h-px bg-white/10 my-1" />
-
-                              {/* Disconnect*/}
-                              <button
-                                onClick={() => {
-                                  setDropdownOpen(false);
-                                  setDisconnectModalOpen(true);
-                                }}
-                                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors text-left"
-                              >
-                                <LogOut className="w-4 h-4 text-red-400" />
-                                <span>Disconnect</span>
-                              </button>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        {/* مودال سفارشی قطع اتصال */}
-                        {disconnectModalOpen && (
-                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-                            <div className="w-full max-w-md bg-[#121118]/90 border border-purple-500/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(168,85,247,0.15)] flex flex-col items-center text-center relative animate-in fade-in zoom-in duration-200">
-                              <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mb-4">
-                                <svg
-                                  className="w-6 h-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                  />
-                                </svg>
+                              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-[10px]">
+                                💎
                               </div>
+                              <span>{account.displayName}</span>
+                            </button>
 
-                              <h3 className="text-xl font-bold text-white mb-2">
-                                Disconnect Wallet
-                              </h3>
-                              <p className="text-white/60 text-sm mb-6">
-                                Are you sure you want to disconnect your wallet?
-                                You can always reconnect anytime.
-                              </p>
+                            <div className="h-4 w-px bg-white/20 mx-1" />
 
-                              <div className="flex items-center gap-3 w-full">
-                                <button
-                                  onClick={() => setDisconnectModalOpen(false)}
-                                  className="flex-1 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-medium transition-all"
+                            <button
+                              onClick={() => setDropdownOpen(!dropdownOpen)}
+                              className="text-white/70 hover:text-white p-1 transition-transform duration-200 focus:outline-none"
+                            >
+                              <ChevronDown
+                                className={cn(
+                                  "w-4 h-4 transition-transform duration-200",
+                                  dropdownOpen && "rotate-180",
+                                )}
+                              />
+                            </button>
+                          </div>
+
+                          <AnimatePresence>
+                            {dropdownOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ duration: 0.15 }}
+                                className="absolute right-0 mt-2 w-56 bg-[#121118]/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-2 shadow-[0_10px_30px_rgba(0,0,0,0.5)] z-50 flex flex-col gap-1"
+                              >
+                                <Link
+                                  href={
+                                    address ? `/profile/${address}` : "/profile"
+                                  }
+                                  onClick={() => setDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                                 >
-                                  Cancel
-                                </button>
+                                  <User className="w-4 h-4 text-purple-400" />
+                                  <span>Profile</span>
+                                </Link>
+
+                                <Link
+                                  href="/dashboard"
+                                  onClick={() => setDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                  <LayoutDashboard className="w-4 h-4 text-purple-400" />
+                                  <span>Dashboard</span>
+                                </Link>
+
+                                <div className="h-px bg-white/10 my-1" />
 
                                 <button
                                   onClick={() => {
-                                    setDisconnectModalOpen(false);
-                                    disconnect();
+                                    setDropdownOpen(false);
+                                    setDisconnectModalOpen(true);
                                   }}
-                                  className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition-all shadow-lg shadow-red-600/20"
+                                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors text-left"
                                 >
-                                  Disconnect
+                                  <LogOut className="w-4 h-4 text-red-400" />
+                                  <span>Disconnect</span>
                                 </button>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          {disconnectModalOpen && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+                              <div className="w-full max-w-md bg-[#121118]/90 border border-purple-500/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(168,85,247,0.15)] flex flex-col items-center text-center relative animate-in fade-in zoom-in duration-200">
+                                <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mb-4">
+                                  <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                    />
+                                  </svg>
+                                </div>
+
+                                <h3 className="text-xl font-bold text-white mb-2">
+                                  Disconnect Wallet
+                                </h3>
+                                <p className="text-white/60 text-sm mb-6">
+                                  Are you sure you want to disconnect your
+                                  wallet? You can always reconnect anytime.
+                                </p>
+
+                                <div className="flex items-center gap-3 w-full">
+                                  <button
+                                    onClick={() =>
+                                      setDisconnectModalOpen(false)
+                                    }
+                                    className="flex-1 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-medium transition-all"
+                                  >
+                                    Cancel
+                                  </button>
+
+                                  <button
+                                    onClick={() => {
+                                      setDisconnectModalOpen(false);
+                                      disconnect();
+                                    }}
+                                    className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition-all shadow-lg shadow-red-600/20"
+                                  >
+                                    Disconnect
+                                  </button>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
+
+                        {/* دکمه List NFT که فقط زمان اتصال ولت در کنار منو ظاهر می‌شود */}
+                        <Link
+                          href="/list"
+                          className="bg-gradient-primary hover:opacity-90 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all hover-glow shadow-md whitespace-nowrap"
+                        >
+                          List NFT
+                        </Link>
                       </div>
                     );
                   })()}
@@ -275,13 +279,6 @@ export function Navbar() {
               );
             }}
           </ConnectButton.Custom>
-
-          <Link
-            href="/list"
-            className="bg-gradient-primary hover:opacity-90 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all hover-glow"
-          >
-            List NFT
-          </Link>
         </div>
 
         <button
