@@ -22,7 +22,7 @@ export function Footer() {
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4 group inline-flex">
               <Hexagon className="w-6 h-6 text-neon-purple group-hover:text-neon-cyan transition-colors" />
-              <span className="text-xl font-bold tracking-tight text-white">NexusMarket</span>
+              <span className="text-xl font-bold tracking-tight text-white">Vault Market</span>
             </Link>
             <p className="text-white/50 mb-6 max-w-sm">
               The future of digital ownership. Trade, auction, and rent extraordinary NFTs on the Polygon Amoy Testnet.
