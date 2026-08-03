@@ -63,7 +63,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-2 group">
             <Hexagon className="w-8 h-8 text-neon-purple group-hover:text-neon-cyan transition-colors" />
             <span className="text-xl font-bold tracking-tight gradient-text">
-              NexusMarket
+              Vault Market
             </span>
           </Link>
 
