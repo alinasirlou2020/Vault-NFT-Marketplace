@@ -141,7 +141,7 @@ export function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
           {isLoadingListings ? (
             Array(4)
               .fill(0)
@@ -201,14 +201,14 @@ export function HomePage() {
             </Link>
           </div>
 
-          <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 gap-6 snap-x hide-scrollbar">
+          <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 gap-4 sm:gap-6 snap-x hide-scrollbar">
             {isLoadingAuctions ? (
               Array(3)
                 .fill(0)
                 .map((_, i) => (
                   <div
                     key={i}
-                    className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
+                    className="w-[160px] sm:w-[280px] flex-shrink-0 snap-start"
                   >
                     <SkeletonCard />
                   </div>
@@ -217,7 +217,7 @@ export function HomePage() {
               liveAuctions.slice(0, 10).map((auction) => (
                 <div
                   key={`auc-${auction.nftAddress}-${auction.tokenId}`}
-                  className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
+                  className="w-[160px] sm:w-[280px] flex-shrink-0 snap-start"
                 >
                   <AuctionCard
                     nftAddress={auction.nftAddress}
@@ -257,14 +257,14 @@ export function HomePage() {
             </Link>
           </div>
 
-          <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 gap-6 snap-x hide-scrollbar">
+          <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 gap-4 sm:gap-6 snap-x hide-scrollbar">
             {isLoadingRentals ? (
               Array(3)
                 .fill(0)
                 .map((_, i) => (
                   <div
                     key={i}
-                    className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
+                    className="w-[160px] sm:w-[280px] flex-shrink-0 snap-start"
                   >
                     <SkeletonCard />
                   </div>
@@ -273,7 +273,7 @@ export function HomePage() {
               availableRentals.slice(0, 10).map((rental) => (
                 <div
                   key={`rent-${rental.nftAddress}-${rental.tokenId}`}
-                  className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
+                  className="w-[160px] sm:w-[280px] flex-shrink-0 snap-start"
                 >
                   <RentalCard
                     nftAddress={rental.nftAddress}
