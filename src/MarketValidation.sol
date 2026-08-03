@@ -62,7 +62,7 @@ abstract contract MarketValidation is MarketplaceStorage {
     //////////////////////////////////////////////////////////////*/
 
     function _checkListed(address nftAddress, uint256 tokenId) internal view {
-        if (sListings[nftAddress][tokenId].active) {
+        if (!sListings[nftAddress][tokenId].active) {
             revert MarketErrors.NotListed();
         }
     }

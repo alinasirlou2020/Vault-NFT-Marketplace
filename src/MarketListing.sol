@@ -6,7 +6,7 @@ import {MarketInternal} from "./MarketInternal.sol";
 import {MarketErrors} from "./MarketErrors.sol";
 
 /// @title Marketplace Listing Module
-/// @author Ali
+/// @author Ali Nasirlou
 /// @notice Handles NFT listings.
 /// @dev Responsible only for listing operations.
 abstract contract MarketListing is MarketAdmin, MarketInternal {

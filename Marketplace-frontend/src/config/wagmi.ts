@@ -9,7 +9,7 @@ export const wagmiConfig = getDefaultConfig({
   transports: {
     [polygonAmoy.id]: http(
       import.meta.env.VITE_RPC_URL ||
-        "https://black-morning-leaf.matic-amoy.quiknode.pro/c2187aafe6d9a121628b152731cf5dd3cb3e6b59/",
+        "https://polygon-amoy.g.alchemy.com/v2/alch_8Th5MQpThiuUqaFeYUkwe",
     ),
   },
   ssr: false,

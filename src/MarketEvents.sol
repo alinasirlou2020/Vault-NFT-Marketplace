@@ -154,20 +154,18 @@ abstract contract MarketEvents {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Emitted when marketplace fee changes.
-    event MarketplaceFeeUpdated(uint256 indexed oldFee, uint256 indexed newFee);
+    event MarketplaceFeeUpdated(uint256 oldFee, uint256 newFee);
 
     /// @notice Emitted whenever proceeds are withdrawn.
-    event ProceedsWithdrawn(address indexed account, uint256 indexed amount);
+    event ProceedsWithdrawn(address indexed account, uint256 amount);
 
     event FeeRecipientUpdated(address indexed oldRecipient, address indexed newRecipient);
 
-    event ProceedsAdded(address indexed account, uint256 indexed amount);
+    event ProceedsAdded(address indexed account, uint256 amount);
 
     event NFTTransferred(address indexed nftAddress, uint256 indexed tokenId, address indexed from, address to);
 
     event MarketplacePaused(address indexed account);
 
     event MarketplaceUnpaused(address indexed account);
-
-    event EmergencyWithdrawal(address indexed to, uint256 indexed amount);
 }

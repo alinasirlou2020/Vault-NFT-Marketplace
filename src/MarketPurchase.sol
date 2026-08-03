@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-
 import {MarketAdmin} from "./MarketAdmin.sol";
 import {MarketInternal} from "./MarketInternal.sol";
 import {MarketErrors} from "./MarketErrors.sol";
@@ -10,7 +8,7 @@ import {MarketErrors} from "./MarketErrors.sol";
 /// @title Marketplace Purchase Module
 /// @author Ali Nasirlou
 /// @notice Handles NFT purchases.
-abstract contract MarketPurchase is MarketAdmin, MarketInternal, ReentrancyGuard {
+abstract contract MarketPurchase is MarketAdmin, MarketInternal {
     /*//////////////////////////////////////////////////////////////
                             BUY NFT
     //////////////////////////////////////////////////////////////*/
@@ -30,6 +28,11 @@ abstract contract MarketPurchase is MarketAdmin, MarketInternal, ReentrancyGuard
         uint256 sellerAmount = listing.price - marketplaceFee;
 
         _removeListing(nftAddress, tokenId);
+
+        // Ownership is about to change — clear any stale auction/rental left
+        // pointing at the old seller so funds never get stuck and no dangling
+        // listing shows up under the new owner's token.
+        _invalidateOtherListings(nftAddress, tokenId);
 
         _addProceeds(listing.seller, sellerAmount);
 

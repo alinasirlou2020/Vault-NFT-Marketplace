@@ -1,32 +1,37 @@
-import { Link } from 'wouter'
-import { motion } from 'framer-motion'
-import { ArrowRight, ShoppingBag, Gavel, Key } from 'lucide-react'
-import { useMarketplaceInfo, useListings, useAllListingTokens } from '@/hooks/useMarketplace'
-import { NftCard } from '@/components/ui/NftCard'
-import { AuctionCard } from '@/components/ui/AuctionCard'
-import { SkeletonCard } from '@/components/ui/SkeletonCard'
-import { useAccount } from 'wagmi'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAuction } from '@/hooks/useMarketplace'
-
-// Wrapper to load auction for preview
-function AuctionPreview({ nftAddress, tokenId }: { nftAddress: `0x${string}`, tokenId: bigint }) {
-  const { data: auction, isLoading } = useAuction(nftAddress, tokenId)
-  
-  if (isLoading) return <SkeletonCard />
-  if (!auction || !auction.active) return null
-  
-  return <AuctionCard nftAddress={nftAddress} tokenId={tokenId} auction={auction} />
-}
+import { Link } from "wouter";
+import { motion } from "framer-motion";
+import { ArrowRight, ShoppingBag, Gavel, Key } from "lucide-react";
+import {
+  useMarketplaceInfo,
+  useListings,
+  useAuctions,
+  useRentals,
+} from "@/hooks/useMarketplace";
+import { NftCard } from "@/components/ui/NftCard";
+import { AuctionCard } from "@/components/ui/AuctionCard";
+import { RentalCard } from "@/components/ui/RentalCard";
+import { SkeletonCard } from "@/components/ui/SkeletonCard";
 
 export function HomePage() {
-  const { isConnected } = useAccount()
-  const { data: info } = useMarketplaceInfo()
-  const { data: listings, isLoading: isLoadingListings } = useListings(0n, 6n)
-  const { data: allTokens } = useAllListingTokens()
+  const { data: info } = useMarketplaceInfo();
+  const { data: listings, isLoading: isLoadingListings } = useListings(0n, 6n);
+  const { data: auctions, isLoading: isLoadingAuctions } = useAuctions(0n, 10n);
+  const { data: rentals, isLoading: isLoadingRentals } = useRentals(0n, 10n);
 
-  const totalListings = info ? Number(info.totalListings) : 0
-  const feePercent = info ? Number(info.marketplaceFee) / 100 : 0
+  const totalListings = info ? Number(info.totalListings) : 0;
+  const feePercent = info ? Number(info.marketplaceFee) / 100 : 0;
+
+  const now = BigInt(Math.floor(Date.now() / 1000));
+
+  // Only show auctions that are actually still open for bidding.
+  const liveAuctions = (auctions ?? []).filter(
+    (auction) => auction.active && auction.endTime > now,
+  );
+
+  // Feature rentals that are actually available to rent right now.
+  const availableRentals = (rentals ?? []).filter(
+    (rental) => !(rental.active && rental.expiresAt > now),
+  );
 
   return (
     <div className="pb-20">
@@ -197,30 +202,100 @@ export function HomePage() {
           </div>
 
           <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 gap-6 snap-x hide-scrollbar">
-            {allTokens
-              ? // Just map all tokens to AuctionPreview. Unactive ones will render null.
-                // In a real app we'd filter offchain or index, but for this constraint we rely on the component.
-                allTokens.slice(0, 10).map((t) => (
+            {isLoadingAuctions ? (
+              Array(3)
+                .fill(0)
+                .map((_, i) => (
                   <div
-                    key={`auc-${t.nftAddress}-${t.tokenId}`}
+                    key={i}
                     className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
                   >
-                    <AuctionPreview
-                      nftAddress={t.nftAddress}
-                      tokenId={t.tokenId}
-                    />
+                    <SkeletonCard />
                   </div>
                 ))
-              : Array(3)
-                  .fill(0)
-                  .map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
-                    >
-                      <SkeletonCard />
-                    </div>
-                  ))}
+            ) : liveAuctions.length > 0 ? (
+              liveAuctions.slice(0, 10).map((auction) => (
+                <div
+                  key={`auc-${auction.nftAddress}-${auction.tokenId}`}
+                  className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
+                >
+                  <AuctionCard
+                    nftAddress={auction.nftAddress}
+                    tokenId={auction.tokenId}
+                    auction={auction}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="w-full py-12 text-center text-white/40 glass rounded-xl border border-white/5">
+                No live auctions right now. Check back soon!
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Rentals */}
+      <section className="py-24 relative border-b border-white/5">
+        <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-neon-cyan/5 to-transparent pointer-events-none" />
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                <Key className="w-8 h-8 text-neon-cyan" />
+                NFT Rentals
+              </h2>
+              <p className="text-white/50">
+                Borrow utility without giving up ownership
+              </p>
+            </div>
+            <Link
+              href="/rentals"
+              className="hidden md:flex items-center gap-2 text-neon-cyan hover:text-white transition-colors font-medium"
+            >
+              Explore Rentals <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="flex overflow-x-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0 gap-6 snap-x hide-scrollbar">
+            {isLoadingRentals ? (
+              Array(3)
+                .fill(0)
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
+                  >
+                    <SkeletonCard />
+                  </div>
+                ))
+            ) : availableRentals.length > 0 ? (
+              availableRentals.slice(0, 10).map((rental) => (
+                <div
+                  key={`rent-${rental.nftAddress}-${rental.tokenId}`}
+                  className="w-[85vw] sm:w-[320px] flex-shrink-0 snap-start"
+                >
+                  <RentalCard
+                    nftAddress={rental.nftAddress}
+                    tokenId={rental.tokenId}
+                    rental={rental}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="w-full py-12 text-center text-white/40 glass rounded-xl border border-white/5">
+                No items available for rent right now. Check back soon!
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 flex justify-center md:hidden">
+            <Link
+              href="/rentals"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-colors font-medium"
+            >
+              View All Rentals
+            </Link>
           </div>
         </div>
       </section>

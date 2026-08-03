@@ -13,19 +13,13 @@ abstract contract MarketQuery is MarketplaceStorage {
     //////////////////////////////////////////////////////////////*/
 
     struct ListingView {
-        // gas-struct-packing
-        uint256 price; // 32 bytes
-        uint256 tokenId; // 32 bytes
-        address nftAddress; // 20 bytes
-        address seller; // 20 bytes
-        uint64 listedAt; // 8 bytes
+        uint256 price;
+        uint256 tokenId;
+        address nftAddress;
+        address seller;
+        uint64 listedAt;
     }
 
-    /*//////////////////////////////////////////////////////////////
-                        RESERVED VIEW STRUCTS
-    //////////////////////////////////////////////////////////////*/
-
-    /// @dev Reserved for future paginated query responses
     struct RentalView {
         uint256 pricePerDay;
         uint256 expiresAt;
@@ -36,8 +30,9 @@ abstract contract MarketQuery is MarketplaceStorage {
         bool active;
     }
 
-    /// @dev Reserved for future paginated query responses
     struct AuctionView {
+        uint256 tokenId;
+        address nftAddress;
         address seller;
         address highestBidder;
         uint96 highestBid;
@@ -61,6 +56,14 @@ abstract contract MarketQuery is MarketplaceStorage {
 
     function getProceeds(address account) public view returns (uint256) {
         return sProceeds[account];
+    }
+
+    function getOffer(address nftAddress, uint256 tokenId) public view returns (Offer memory) {
+        return sOffers[nftAddress][tokenId];
+    }
+
+    function getAuction(address nftAddress, uint256 tokenId) public view returns (Auction memory) {
+        return sAuctions[nftAddress][tokenId];
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -179,12 +182,222 @@ abstract contract MarketQuery is MarketplaceStorage {
         });
     }
 
-    function getOffer(address nftAddress, uint256 tokenId) public view returns (Offer memory) {
-        return sOffers[nftAddress][tokenId];
+    /*//////////////////////////////////////////////////////////////
+                        RENTAL QUERIES
+    //////////////////////////////////////////////////////////////*/
+
+    function getTotalRentals() external view returns (uint256) {
+        return sRentalTokens.length;
     }
 
-    function getAuction(address nftAddress, uint256 tokenId) public view returns (Auction memory) {
-        return sAuctions[nftAddress][tokenId];
+    function getRentalToken(uint256 index) external view returns (ListedToken memory) {
+        return sRentalTokens[index];
+    }
+
+    function getAllRentalTokens() external view returns (ListedToken[] memory) {
+        return sRentalTokens;
+    }
+
+    function getRentals(uint256 offset, uint256 limit) external view returns (RentalView[] memory) {
+        uint256 total = sRentalTokens.length;
+
+        if (offset >= total) {
+            return new RentalView[](0);
+        }
+
+        uint256 end = offset + limit;
+
+        if (end > total) {
+            end = total;
+        }
+
+        RentalView[] memory rentals = new RentalView[](end - offset);
+
+        uint256 current = 0;
+
+        for (uint256 i = offset; i < end;) {
+            ListedToken memory token = sRentalTokens[i];
+
+            Rental memory rental = sRentals[token.nftAddress][token.tokenId];
+
+            rentals[current] = RentalView({
+                nftAddress: token.nftAddress,
+                tokenId: token.tokenId,
+                landlord: rental.landlord,
+                tenant: rental.tenant,
+                pricePerDay: rental.pricePerDay,
+                expiresAt: rental.expiresAt,
+                active: rental.active
+            });
+
+            unchecked {
+                ++current;
+                ++i;
+            }
+        }
+
+        return rentals;
+    }
+
+    function getRentalsByLandlord(address landlord) external view returns (RentalView[] memory) {
+        uint256 total = sRentalTokens.length;
+
+        uint256 count = 0;
+
+        for (uint256 i; i < total;) {
+            ListedToken memory token = sRentalTokens[i];
+
+            if (sRentals[token.nftAddress][token.tokenId].landlord == landlord) {
+                ++count;
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        RentalView[] memory rentals = new RentalView[](count);
+
+        uint256 current = 0;
+
+        for (uint256 i; i < total;) {
+            ListedToken memory token = sRentalTokens[i];
+
+            Rental memory rental = sRentals[token.nftAddress][token.tokenId];
+
+            if (rental.landlord == landlord) {
+                rentals[current] = RentalView({
+                    nftAddress: token.nftAddress,
+                    tokenId: token.tokenId,
+                    landlord: rental.landlord,
+                    tenant: rental.tenant,
+                    pricePerDay: rental.pricePerDay,
+                    expiresAt: rental.expiresAt,
+                    active: rental.active
+                });
+
+                unchecked {
+                    ++current;
+                }
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        return rentals;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                        AUCTION QUERIES
+    //////////////////////////////////////////////////////////////*/
+
+    function getTotalAuctions() external view returns (uint256) {
+        return sAuctionTokens.length;
+    }
+
+    function getAuctionToken(uint256 index) external view returns (ListedToken memory) {
+        return sAuctionTokens[index];
+    }
+
+    function getAllAuctionTokens() external view returns (ListedToken[] memory) {
+        return sAuctionTokens;
+    }
+
+    function getAuctions(uint256 offset, uint256 limit) external view returns (AuctionView[] memory) {
+        uint256 total = sAuctionTokens.length;
+
+        if (offset >= total) {
+            return new AuctionView[](0);
+        }
+
+        uint256 end = offset + limit;
+
+        if (end > total) {
+            end = total;
+        }
+
+        AuctionView[] memory auctions = new AuctionView[](end - offset);
+
+        uint256 current = 0;
+
+        for (uint256 i = offset; i < end;) {
+            ListedToken memory token = sAuctionTokens[i];
+
+            Auction memory auction = sAuctions[token.nftAddress][token.tokenId];
+
+            auctions[current] = AuctionView({
+                nftAddress: token.nftAddress,
+                tokenId: token.tokenId,
+                seller: auction.seller,
+                highestBidder: auction.highestBidder,
+                highestBid: auction.highestBid,
+                startingPrice: auction.startingPrice,
+                startTime: auction.startTime,
+                endTime: auction.endTime,
+                active: auction.active
+            });
+
+            unchecked {
+                ++current;
+                ++i;
+            }
+        }
+
+        return auctions;
+    }
+
+    function getAuctionsBySeller(address seller) external view returns (AuctionView[] memory) {
+        uint256 total = sAuctionTokens.length;
+
+        uint256 count = 0;
+
+        for (uint256 i; i < total;) {
+            ListedToken memory token = sAuctionTokens[i];
+
+            if (sAuctions[token.nftAddress][token.tokenId].seller == seller) {
+                ++count;
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        AuctionView[] memory auctions = new AuctionView[](count);
+
+        uint256 current = 0;
+
+        for (uint256 i; i < total;) {
+            ListedToken memory token = sAuctionTokens[i];
+
+            Auction memory auction = sAuctions[token.nftAddress][token.tokenId];
+
+            if (auction.seller == seller) {
+                auctions[current] = AuctionView({
+                    nftAddress: token.nftAddress,
+                    tokenId: token.tokenId,
+                    seller: auction.seller,
+                    highestBidder: auction.highestBidder,
+                    highestBid: auction.highestBid,
+                    startingPrice: auction.startingPrice,
+                    startTime: auction.startTime,
+                    endTime: auction.endTime,
+                    active: auction.active
+                });
+
+                unchecked {
+                    ++current;
+                }
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        return auctions;
     }
 
     function isAuctionActive(address nftAddress, uint256 tokenId) public view returns (bool) {

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-
 import {MarketAdmin} from "./MarketAdmin.sol";
 import {MarketInternal} from "./MarketInternal.sol";
 import {MarketErrors} from "./MarketErrors.sol";
@@ -10,8 +8,8 @@ import {MarketErrors} from "./MarketErrors.sol";
 /// @title Marketplace Offer Module
 /// @author Ali Nasirlou
 /// @notice Handles NFT offers.
-/// @dev Buyers can make, cancel and sellers can accept offers.
-abstract contract MarketOffer is MarketAdmin, MarketInternal, ReentrancyGuard {
+/// @dev Buyers can make, update, cancel and sellers can accept offers.
+abstract contract MarketOffer is MarketAdmin, MarketInternal {
     /*//////////////////////////////////////////////////////////////
                             MAKE OFFER
     //////////////////////////////////////////////////////////////*/
@@ -49,6 +47,67 @@ abstract contract MarketOffer is MarketAdmin, MarketInternal, ReentrancyGuard {
         offer.active = true;
 
         emit OfferCreated(msg.sender, nftAddress, tokenId, amount, offer.expiresAt);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                        UPDATE OFFER PRICE
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice Updates the price of an existing active offer.
+    /// @dev Since offer funds are escrowed in this contract, increasing the price
+    ///      requires sending the difference as msg.value, while decreasing the
+    ///      price immediately refunds the difference to the buyer.
+    function updateOfferPrice(address nftAddress, uint256 tokenId, uint96 newAmount)
+        external
+        payable
+        nonReentrant
+        whenNotPaused
+    {
+        _checkPrice(newAmount);
+
+        _checkOfferExists(nftAddress, tokenId);
+
+        _checkOfferActive(nftAddress, tokenId);
+
+        Offer storage offer = sOffers[nftAddress][tokenId];
+
+        if (offer.buyer != msg.sender) {
+            revert MarketErrors.NotOwner();
+        }
+
+        uint256 oldAmount = offer.amount;
+
+        if (newAmount == oldAmount) {
+            revert MarketErrors.InvalidAmount();
+        }
+
+        if (newAmount > oldAmount) {
+            uint256 topUp = newAmount - oldAmount;
+
+            if (msg.value != topUp) {
+                revert MarketErrors.InvalidAmount();
+            }
+
+            offer.amount = newAmount;
+        } else {
+            if (msg.value != 0) {
+                revert MarketErrors.InvalidAmount();
+            }
+
+            uint256 refund = oldAmount - newAmount;
+
+            // Effect
+            offer.amount = newAmount;
+
+            // Interaction
+            (bool success,) = payable(msg.sender).call{value: refund}("");
+
+            if (!success) {
+                revert MarketErrors.TransferFailed();
+            }
+        }
+
+        emit OfferUpdated(msg.sender, nftAddress, tokenId, oldAmount, newAmount);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -107,6 +166,12 @@ abstract contract MarketOffer is MarketAdmin, MarketInternal, ReentrancyGuard {
             emit ListingRemoved(msg.sender, nftAddress, tokenId, ListingRemovalReason.Sold);
         }
 
+        // Ownership is about to change — clear any stale auction/rental left
+        // pointing at the old seller so funds never get stuck and no dangling
+        // listing shows up under the new owner's token.
+        _invalidateOtherListings(nftAddress, tokenId);
+
+        _removeOffer(nftAddress, tokenId);
         _transferNFT(nftAddress, msg.sender, offer.buyer, tokenId);
 
         emit ProceedsAdded(msg.sender, sellerAmount);
@@ -114,8 +179,6 @@ abstract contract MarketOffer is MarketAdmin, MarketInternal, ReentrancyGuard {
         emit ProceedsAdded(sFeeRecipient, marketplaceFee);
 
         emit OfferAccepted(msg.sender, offer.buyer, nftAddress, tokenId, offer.amount, marketplaceFee);
-
-        _removeOffer(nftAddress, tokenId);
     }
 
     /*//////////////////////////////////////////////////////////////

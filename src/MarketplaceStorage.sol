@@ -35,6 +35,7 @@ abstract contract MarketplaceStorage {
         uint64 expiresAt;
         bool active;
         bool useERC4907;
+        uint32 index;
     }
 
     struct Offer {
@@ -52,6 +53,7 @@ abstract contract MarketplaceStorage {
         uint64 startTime;
         uint64 endTime;
         bool active;
+        uint32 index;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -71,6 +73,9 @@ abstract contract MarketplaceStorage {
     /// @notice nft => tokenId => Rental
     mapping(address => mapping(uint256 => Rental)) internal sRentals;
 
+    /// @notice Array of all rental listings.
+    ListedToken[] internal sRentalTokens;
+
     /*//////////////////////////////////////////////////////////////
                               PAYMENTS
     //////////////////////////////////////////////////////////////*/
@@ -89,6 +94,9 @@ abstract contract MarketplaceStorage {
     //////////////////////////////////////////////////////////////*/
 
     mapping(address => mapping(uint256 => Auction)) internal sAuctions;
+
+    /// @notice Array of all auction tokens.
+    ListedToken[] internal sAuctionTokens;
 
     /*//////////////////////////////////////////////////////////////
                         MARKETPLACE CONFIGURATION

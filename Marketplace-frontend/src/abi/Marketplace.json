@@ -176,19 +176,6 @@
   },
   {
     "type": "function",
-    "name": "emergencyWithdraw",
-    "inputs": [
-      {
-        "name": "_to",
-        "type": "address",
-        "internalType": "address payable"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "endAuction",
     "inputs": [
       {
@@ -225,7 +212,57 @@
   },
   {
     "type": "function",
+    "name": "getAllAuctionTokens",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct MarketplaceStorage.ListedToken[]",
+        "components": [
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "getAllListingTokens",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct MarketplaceStorage.ListedToken[]",
+        "components": [
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAllRentalTokens",
     "inputs": [],
     "outputs": [
       {
@@ -303,6 +340,11 @@
             "name": "active",
             "type": "bool",
             "internalType": "bool"
+          },
+          {
+            "name": "index",
+            "type": "uint32",
+            "internalType": "uint32"
           }
         ]
       }
@@ -329,6 +371,174 @@
         "name": "",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAuctionToken",
+    "inputs": [
+      {
+        "name": "index",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct MarketplaceStorage.ListedToken",
+        "components": [
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAuctions",
+    "inputs": [
+      {
+        "name": "offset",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "limit",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct MarketQuery.AuctionView[]",
+        "components": [
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "seller",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "highestBidder",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "highestBid",
+            "type": "uint96",
+            "internalType": "uint96"
+          },
+          {
+            "name": "startingPrice",
+            "type": "uint96",
+            "internalType": "uint96"
+          },
+          {
+            "name": "startTime",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "endTime",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "active",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAuctionsBySeller",
+    "inputs": [
+      {
+        "name": "seller",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct MarketQuery.AuctionView[]",
+        "components": [
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "seller",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "highestBidder",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "highestBid",
+            "type": "uint96",
+            "internalType": "uint96"
+          },
+          {
+            "name": "startingPrice",
+            "type": "uint96",
+            "internalType": "uint96"
+          },
+          {
+            "name": "startTime",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "endTime",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "active",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
       }
     ],
     "stateMutability": "view"
@@ -736,6 +946,11 @@
             "name": "useERC4907",
             "type": "bool",
             "internalType": "bool"
+          },
+          {
+            "name": "index",
+            "type": "uint32",
+            "internalType": "uint32"
           }
         ]
       }
@@ -744,7 +959,181 @@
   },
   {
     "type": "function",
+    "name": "getRentalToken",
+    "inputs": [
+      {
+        "name": "index",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct MarketplaceStorage.ListedToken",
+        "components": [
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getRentals",
+    "inputs": [
+      {
+        "name": "offset",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "limit",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct MarketQuery.RentalView[]",
+        "components": [
+          {
+            "name": "pricePerDay",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "expiresAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "landlord",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tenant",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "active",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getRentalsByLandlord",
+    "inputs": [
+      {
+        "name": "landlord",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct MarketQuery.RentalView[]",
+        "components": [
+          {
+            "name": "pricePerDay",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "expiresAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "tokenId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "nftAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "landlord",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tenant",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "active",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getTotalAuctions",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "getTotalListings",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getTotalRentals",
     "inputs": [],
     "outputs": [
       {
@@ -1000,6 +1389,29 @@
   },
   {
     "type": "function",
+    "name": "updateOfferPrice",
+    "inputs": [
+      {
+        "name": "nftAddress",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "newAmount",
+        "type": "uint96",
+        "internalType": "uint96"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
     "name": "updateRentalPrice",
     "inputs": [
       {
@@ -1018,6 +1430,13 @@
         "internalType": "uint96"
       }
     ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "withdrawMarketplaceFees",
+    "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -1171,25 +1590,6 @@
         "name": "highestBid",
         "type": "uint256",
         "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "EmergencyWithdrawal",
-    "inputs": [
-      {
-        "name": "to",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": true,
         "internalType": "uint256"
       }
     ],
@@ -1443,13 +1843,13 @@
       {
         "name": "oldFee",
         "type": "uint256",
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256"
       },
       {
         "name": "newFee",
         "type": "uint256",
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256"
       }
     ],
@@ -1699,7 +2099,7 @@
       {
         "name": "amount",
         "type": "uint256",
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256"
       }
     ],
@@ -1718,7 +2118,7 @@
       {
         "name": "amount",
         "type": "uint256",
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256"
       }
     ],
@@ -1876,7 +2276,7 @@
     "name": "BidTooLow",
     "inputs": [
       {
-        "name": "currentBid",
+        "name": "minimumRequired",
         "type": "uint256",
         "internalType": "uint256"
       }

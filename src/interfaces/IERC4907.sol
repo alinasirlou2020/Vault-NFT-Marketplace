@@ -13,5 +13,5 @@ interface IERC4907 is IERC165 {
     /// @notice get expire timestamp
     function userExpires(uint256 tokenId) external view returns (uint256);
 
-    event UpdateUser(uint256 indexed tokenId, address indexed user, uint64 indexed expires);
+    event UpdateUser(uint256 indexed tokenId, address indexed user, uint64 expires);
 }

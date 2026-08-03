@@ -1,47 +1,30 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Gavel } from 'lucide-react'
-import { useAllListingTokens, useAuction } from '@/hooks/useMarketplace'
-import { AuctionCard } from '@/components/ui/AuctionCard'
-import { SkeletonCard } from '@/components/ui/SkeletonCard'
-
-// Intermediate component to fetch auction data for a token
-function AuctionLoader({ 
-  nftAddress, 
-  tokenId,
-  filterStatus
-}: { 
-  nftAddress: `0x${string}`
-  tokenId: bigint
-  filterStatus: 'active' | 'ended'
-}) {
-  const { data: auction, isLoading } = useAuction(nftAddress, tokenId)
-
-  if (isLoading) return <SkeletonCard />
-  
-  if (!auction) return null
-
-  // Check if actually active (active flag + time not expired)
-  const isTimeExpired = auction.endTime <= Math.floor(Date.now() / 1000)
-  const isActuallyActive = auction.active && !isTimeExpired
-
-  if (filterStatus === 'active' && !isActuallyActive) return null
-  if (filterStatus === 'ended' && (isActuallyActive || (!auction.active && auction.endTime === 0n))) return null
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4 }}
-    >
-      <AuctionCard nftAddress={nftAddress} tokenId={tokenId} auction={auction} />
-    </motion.div>
-  )
-}
+import { motion } from "framer-motion";
+import { Gavel } from "lucide-react";
+import { useAuctions, useTotalAuctions } from "@/hooks/useMarketplace";
+import { AuctionCard } from "@/components/ui/AuctionCard";
+import { SkeletonCard } from "@/components/ui/SkeletonCard";
 
 export function AuctionsPage() {
-  const [filter, setFilter] = useState<'active' | 'ended'>('active')
-  const { data: allTokens, isLoading } = useAllListingTokens()
+  const { data: total, isLoading: isLoadingTotal } = useTotalAuctions();
+  const { data: auctions, isLoading: isLoadingAuctions } = useAuctions(
+    0n,
+    total ?? 0n,
+  );
+
+  // While the total count hasn't loaded yet, keep showing skeletons instead of
+  // flashing the "no auctions" empty state before the real query kicks in.
+  const isLoading =
+    isLoadingTotal || (total !== undefined && isLoadingAuctions);
+
+  const now = BigInt(Math.floor(Date.now() / 1000));
+
+  // sAuctionTokens only ever contains auctions that are still open on-chain, so
+  // `active` is effectively always true here — but we still filter out auctions
+  // whose endTime has passed and just haven't been finalized (endAuction) yet,
+  // so they don't show up as "live" for a few extra minutes/hours.
+  const liveAuctions = (auctions ?? []).filter(
+    (auction) => auction.active && auction.endTime > now,
+  );
 
   return (
     <div className="container mx-auto px-4 md:px-6 pt-32 pb-20">
@@ -51,46 +34,39 @@ export function AuctionsPage() {
             <Gavel className="w-8 h-8 text-neon-pink" />
             Auctions
           </h1>
-          <p className="text-white/50">Bid, outbid, and win exclusive digital assets.</p>
+          <p className="text-white/50">
+            Bid, outbid, and win exclusive digital assets.
+          </p>
         </div>
-        
-        <div className="flex bg-white/5 rounded-xl p-1 border border-white/10">
-          <button
-            onClick={() => setFilter('active')}
-            className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
-              filter === 'active' 
-                ? 'bg-gradient-pink text-white shadow-lg' 
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            Live Auctions
-          </button>
-          <button
-            onClick={() => setFilter('ended')}
-            className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
-              filter === 'ended' 
-                ? 'bg-white/10 text-white shadow-lg' 
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            Ended
-          </button>
+
+        <div className="px-6 py-2 rounded-xl bg-gradient-pink text-white text-sm font-semibold shadow-lg border border-white/10">
+          Live Auctions
         </div>
       </div>
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)}
+          {Array(8)
+            .fill(0)
+            .map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
         </div>
-      ) : allTokens && allTokens.length > 0 ? (
+      ) : liveAuctions.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {allTokens.map(token => (
-            <AuctionLoader 
-              key={`auc-${token.nftAddress}-${token.tokenId}`}
-              nftAddress={token.nftAddress} 
-              tokenId={token.tokenId} 
-              filterStatus={filter}
-            />
+          {liveAuctions.map((auction) => (
+            <motion.div
+              key={`auc-${auction.nftAddress}-${auction.tokenId}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+            >
+              <AuctionCard
+                nftAddress={auction.nftAddress}
+                tokenId={auction.tokenId}
+                auction={auction}
+              />
+            </motion.div>
           ))}
         </div>
       ) : (
@@ -98,12 +74,14 @@ export function AuctionsPage() {
           <div className="w-24 h-24 mb-6 rounded-full bg-neon-pink/10 flex items-center justify-center border border-neon-pink/20">
             <Gavel className="w-10 h-10 text-neon-pink" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">No auctions found</h3>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            No auctions found
+          </h3>
           <p className="text-white/50 max-w-sm">
             There are currently no items listed for auction.
           </p>
         </div>
       )}
     </div>
-  )
+  );
 }

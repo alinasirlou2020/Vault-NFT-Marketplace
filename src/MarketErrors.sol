@@ -54,7 +54,7 @@ library MarketErrors {
     error AuctionNotFound();
     error AuctionAlreadyEnded();
     error AuctionStillRunning();
-    error BidTooLow(uint256 currentBid);
+    error BidTooLow(uint256 minimumRequired);
     error AuctionAlreadyStarted();
 
     /*//////////////////////////////////////////////////////////////

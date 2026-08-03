@@ -5,13 +5,12 @@ import {MarketAdmin} from "./MarketAdmin.sol";
 import {MarketInternal} from "./MarketInternal.sol";
 import {MarketErrors} from "./MarketErrors.sol";
 import {IERC4907} from "./interfaces/IERC4907.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title Marketplace Rental Module
 /// @author Ali Nasirlou
 /// @notice Handles NFT rental listings.
 /// @dev Supports both normal ERC721 rentals and ERC4907 NFTs.
-abstract contract MarketRent is MarketAdmin, MarketInternal, ReentrancyGuard {
+abstract contract MarketRent is MarketAdmin, MarketInternal {
     /*//////////////////////////////////////////////////////////////
                             LIST FOR RENT
     //////////////////////////////////////////////////////////////*/
@@ -46,6 +45,8 @@ abstract contract MarketRent is MarketAdmin, MarketInternal, ReentrancyGuard {
         rental.active = true;
 
         rental.useERC4907 = _supportsERC4907(nftAddress);
+
+        _addRentalToken(nftAddress, tokenId);
 
         emit RentalListed(msg.sender, nftAddress, tokenId, pricePerDay);
     }
@@ -140,6 +141,8 @@ abstract contract MarketRent is MarketAdmin, MarketInternal, ReentrancyGuard {
             revert MarketErrors.RentalStillActive();
         }
 
+        _removeRentalToken(nftAddress, tokenId);
+
         delete sRentals[nftAddress][tokenId];
 
         emit RentalEnded(msg.sender, address(0), nftAddress, tokenId);
@@ -157,6 +160,8 @@ abstract contract MarketRent is MarketAdmin, MarketInternal, ReentrancyGuard {
         if (block.timestamp < rental.expiresAt) {
             revert MarketErrors.RentalStillActive();
         }
+
+        _removeRentalToken(nftAddress, tokenId);
 
         delete sRentals[nftAddress][tokenId];
 

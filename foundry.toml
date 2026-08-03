@@ -12,8 +12,7 @@ remappings = [
 
 
 optimizer = true
-optimizer_runs = 1000
-
+optimizer_runs = 256
 
 evm_version = "cancun"
 

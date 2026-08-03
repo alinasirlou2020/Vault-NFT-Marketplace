@@ -4,12 +4,11 @@ pragma solidity 0.8.24;
 import {MarketAdmin} from "./MarketAdmin.sol";
 import {MarketInternal} from "./MarketInternal.sol";
 import {MarketErrors} from "./MarketErrors.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title Marketplace Auction Module
 /// @author Ali Nasirlou
 /// @notice Handles NFT auctions.
-abstract contract MarketAuction is MarketAdmin, MarketInternal, ReentrancyGuard {
+abstract contract MarketAuction is MarketAdmin, MarketInternal {
     /// @notice Creates a new auction.
     function createAuction(address nftAddress, uint256 tokenId, uint96 startingPrice, uint64 duration)
         external
@@ -32,8 +31,11 @@ abstract contract MarketAuction is MarketAdmin, MarketInternal, ReentrancyGuard 
             startingPrice: startingPrice,
             startTime: uint64(block.timestamp),
             endTime: uint64(block.timestamp + duration),
-            active: true
+            active: true,
+            index: 0
         });
+
+        _addAuctionToken(nftAddress, tokenId);
 
         emit AuctionCreated(msg.sender, nftAddress, tokenId, startingPrice, block.timestamp, block.timestamp + duration);
     }
@@ -73,11 +75,13 @@ abstract contract MarketAuction is MarketAdmin, MarketInternal, ReentrancyGuard 
 
     function endAuction(address nftAddress, uint256 tokenId) external nonReentrant whenNotPaused {
         _checkAuctionExists(nftAddress, tokenId);
-        Auction storage auction = sAuctions[nftAddress][tokenId];
+        Auction memory auction = sAuctions[nftAddress][tokenId];
 
         if (block.timestamp < auction.endTime) {
             revert MarketErrors.AuctionStillRunning();
         }
+
+        _removeAuctionToken(nftAddress, tokenId);
 
         delete sAuctions[nftAddress][tokenId];
 
@@ -122,6 +126,8 @@ abstract contract MarketAuction is MarketAdmin, MarketInternal, ReentrancyGuard 
         if (auction.highestBidder != address(0)) {
             revert MarketErrors.AuctionAlreadyStarted();
         }
+
+        _removeAuctionToken(nftAddress, tokenId);
 
         delete sAuctions[nftAddress][tokenId];
 

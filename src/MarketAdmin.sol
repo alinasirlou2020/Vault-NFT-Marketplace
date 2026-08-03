@@ -7,12 +7,13 @@ import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {MarketplaceStorage} from "./MarketplaceStorage.sol";
 import {MarketEvents} from "./MarketEvents.sol";
 import {MarketErrors} from "./MarketErrors.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title Marketplace Administration Module
 /// @author Ali Nasirlou
 /// @notice Handles owner-controlled marketplace configuration.
 /// @dev Includes fee management, emergency pause and fee recipient management.
-abstract contract MarketAdmin is Ownable, Pausable, MarketplaceStorage, MarketEvents {
+abstract contract MarketAdmin is Ownable, Pausable, MarketplaceStorage, MarketEvents, ReentrancyGuard {
     constructor(address initialOwner) Ownable(initialOwner) {
         if (initialOwner == address(0)) {
             revert MarketErrors.ZeroAddress();
@@ -98,20 +99,28 @@ abstract contract MarketAdmin is Ownable, Pausable, MarketplaceStorage, MarketEv
     }
 
     /*//////////////////////////////////////////////////////////////
-                        EMERGENCY WITHDRAW
+                        FEE WITHDRAWAL
     //////////////////////////////////////////////////////////////*/
 
-    // این تابع را در فایل اصلی یا MarketAdmin اضافه کن
-    function emergencyWithdraw(address payable _to) external onlyOwner {
-        uint256 balance = address(this).balance;
+    /// @notice Withdraws accumulated marketplace fees to the fee recipient.
+    /// @dev Only withdraws sFeeRecipient's own proceeds balance — never touches
+    ///      other users' pending proceeds (sellers, landlords, refunded bidders).
+    function withdrawMarketplaceFees() external onlyOwner nonReentrant {
+        uint256 amount = sProceeds[sFeeRecipient];
 
-        // نکته امنیتی: بررسی کن که موجودی صفر نباشد
-        if (balance == 0) revert MarketErrors.NoProceeds();
+        if (amount == 0) revert MarketErrors.NoProceeds();
 
-        // ارسال تمام موجودی قرارداد به مالک
-        (bool success,) = _to.call{value: balance}("");
-        if (!success) revert MarketErrors.TransferFailed();
+        // Effects
+        sProceeds[sFeeRecipient] = 0;
 
-        emit EmergencyWithdrawal(_to, balance);
+        // Interaction
+        (bool success,) = payable(sFeeRecipient).call{value: amount}("");
+
+        if (!success) {
+            sProceeds[sFeeRecipient] = amount;
+            revert MarketErrors.TransferFailed();
+        }
+
+        emit ProceedsWithdrawn(sFeeRecipient, amount);
     }
 }
