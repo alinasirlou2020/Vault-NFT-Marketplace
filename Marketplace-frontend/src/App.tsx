@@ -58,7 +58,7 @@ export default function App() {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={rkTheme} modalSize="compact">
+        <RainbowKitProvider theme={rkTheme} modalSize="wide">
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
             <div className="min-h-screen flex flex-col">
               <Navbar />
