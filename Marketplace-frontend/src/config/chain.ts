@@ -12,7 +12,7 @@ export const polygonAmoy = defineChain({
     default: {
       http: [
         import.meta.env.VITE_RPC_URL ||
-          'https://rpc-amoy.polygon.technology',
+          'https://cold-silent-theorem.matic-amoy.quiknode.pro/f88dbb4e0fa6438699bb7207e0f1feee29b7edfe/',
       ],
     },
   },

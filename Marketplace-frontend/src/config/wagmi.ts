@@ -11,7 +11,7 @@ export const wagmiConfig = getDefaultConfig({
   transports: {
     [polygonAmoy.id]: http(
       import.meta.env.VITE_RPC_URL ||
-        "https://polygon-amoy.g.alchemy.com/v2/alch_8Th5MQpThiuUqaFeYUkwe",
+        "https://cold-silent-theorem.matic-amoy.quiknode.pro/f88dbb4e0fa6438699bb7207e0f1feee29b7edfe/",
     ),
   },
   ssr: false,
